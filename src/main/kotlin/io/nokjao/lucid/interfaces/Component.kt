@@ -1,5 +1,5 @@
 package io.nokjao.lucid.interfaces
 
-interface State {
+interface Component {
     fun update()
 }

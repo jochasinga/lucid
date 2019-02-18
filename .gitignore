@@ -32,3 +32,9 @@
 libs/
 build/
 out/
+*.log
+log/
+.gradle/
+gradle/
+gradlew
+*.bat

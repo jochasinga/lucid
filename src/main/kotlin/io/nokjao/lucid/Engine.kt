@@ -1,70 +1,92 @@
 package io.nokjao.lucid
 
+import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL11.glClearColor
 import java.util.*
-
 
 class Engine {
 
     private val tag = "io.nokjao.lucid.Engine"
-    private var thread: Thread? = null
-    private var renderer: Renderer? = null
 
-    var running = false
+    private lateinit var window: Window
+    private lateinit var thread: Thread
+    private lateinit var renderer: Renderer
+    private lateinit var world: World
+    private lateinit var inputHandler: InputHandler
 
-    inner class Loop(private val fps: Double = 60.0,
-                     private val ups: Double = 30.0) : Runnable {
+    private var running = false
 
-        private val tag = "io.nokjao.lucid.Loop"
+    inner class Loop(
+        private val fps: Int = 75,
+        private val ups: Int = 30
+    ) : Runnable {
 
         private val msPerUpdate = 1.0 / ups
 
         override fun run() {
-            var previous = Date().time.toDouble()
-            var lag = 0.0
 
-            while (running) {
-                val current = Date().time.toDouble()
-                val elapsed = current - previous
-                previous = current
-                lag += elapsed
+            System.out.println("Hello Lucid!")
 
-                handleInput()
+            init()
+            loop()
 
-                while (lag >= msPerUpdate) {
-                    update()
-                    lag -= msPerUpdate
+            window.destroy()
+        }
+
+        private fun init() {
+            window = Window("Hello World", 300, 300, true)
+            window.init()
+            renderer = Renderer()
+        }
+
+
+        private fun loop() {
+            GL.createCapabilities()
+            glClearColor(1.0f, 0.0f, 0.0f, 0.0f)
+
+            window.let {
+
+                var previous = Date().time.toDouble()
+                var lag = 0.0
+
+                while (!it.shouldClose()) {
+
+                    val current = Date().time.toDouble()
+                    val elapsed = current - previous
+                    previous = current
+                    lag += elapsed
+
+                    // handleInput()
+                    System.out.println("handling output")
+
+                    while (lag >= msPerUpdate) {
+                        // update()
+                        System.out.println("catching up")
+                        lag -= msPerUpdate
+                    }
+
+                    renderer.render(lag / msPerUpdate)
+
+                    it.swapBuffers()
+                    it.pollEvents()
                 }
-
-                renderer?.render(lag / msPerUpdate)
             }
-        }
-
-
-        fun update() {
-            // World logic
-            TODO()
-        }
-
-        fun handleInput() {
-            TODO()
         }
     }
 
     fun start() {
+
         running = true
         thread = Thread(Loop(), tag)
-        val os = System.getProperty("os.name")?.let {
+
+        val os = System.getProperty("os.name")?.also {
             if (it.contains("Mac")) {
-                thread?.run()
+                thread.run()
             } else {
-                thread?.start()
+                thread.start()
             }
         }
 
         System.out.println("Starting engine for $os")
-    }
-
-    fun stop() {
-        running = false
     }
 }
