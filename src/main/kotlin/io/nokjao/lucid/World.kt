@@ -1,9 +1,9 @@
 package io.nokjao.lucid
 
-import io.nokjao.lucid.interfaces.State
+import io.nokjao.lucid.interfaces.*
 
-class World : State {
-    override fun update() {
+class World: IEntity {
+    override fun update(component: IComponent) {
         TODO()
     }
 }

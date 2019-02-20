@@ -3,16 +3,17 @@ package io.nokjao.lucid
 import org.lwjgl.glfw.*
 import org.lwjgl.glfw.Callbacks.*
 import org.lwjgl.glfw.GLFW.*
+import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryStack.*
 import java.lang.IllegalStateException
 
 
-class Window(private val title: String, private val width: Int,
-             private val height: Int, private val vSync: Boolean) {
+class Window(val title: String, val width: Int,
+             val height: Int, var vSync: Boolean) {
 
     private var windowRef: Long? = null
-    private var resized = false
+    var resized = false
 
     fun init() {
         // Setup an error callback. The default implementation
@@ -26,7 +27,7 @@ class Window(private val title: String, private val width: Int,
 
         // Window will become visible after creation
         glfwDefaultWindowHints()
-        glfwWindowHint(GLFW_VISIBLE, GL_TRUE)
+        glfwWindowHint(GLFW_VISIBLE, GL_FALSE)
         glfwWindowHint(GLFW_RESIZABLE, GL_TRUE)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2)
@@ -53,13 +54,13 @@ class Window(private val title: String, private val width: Int,
                     glfwGetWindowSize(this, pWidth, pHeight)
                 }
 
-                val vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor())
+                val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
 
                 windowRef?.apply {
                     glfwSetWindowPos(
                         this,
-                        (vidmode?.width() ?: -pWidth.get(0)) / 2,
-                        (vidmode?.height() ?: -pHeight.get(0)) / 2
+                        (videoMode?.width() ?: -pWidth.get(0)) / 2,
+                        (videoMode?.height() ?: -pHeight.get(0)) / 2
                     )
                 }
             }
@@ -69,7 +70,6 @@ class Window(private val title: String, private val width: Int,
             glfwMakeContextCurrent(it)
         }
 
-
         // Enable v-sync
         if (vSync)
             glfwSwapInterval(1)
@@ -77,23 +77,36 @@ class Window(private val title: String, private val width: Int,
         windowRef?.let {
             glfwShowWindow(it)
         }
+
+        GL.createCapabilities()
+
+        // Set clear color
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
     }
 
-    fun isKeyPressed(keyCode: Int) {
-        windowRef?.let {
+    fun setClearColor(r: Float, g: Float, b: Float, alpha: Float) {
+        glClearColor(r, g, b, alpha)
+    }
+
+    fun isKeyPressed(keyCode: Int): Boolean {
+        return windowRef?.let {
             glfwGetKey(it, keyCode) == GLFW_PRESS
-        }
+        } ?: false
     }
 
-    fun swapBuffers() {
+    fun shouldClose() {
         windowRef?.let {
-            glfwSwapBuffers(it)
+            glfwWindowShouldClose(it)
         }
     }
 
-    fun shouldClose(): Boolean = glfwWindowShouldClose(windowRef!!)
+    fun isResized() = resized
 
-    fun getTitle(): String = title
+    fun isvSync() = vSync
+
+    fun setvSync(vSync: Boolean) {
+        this.vSync = vSync
+    }
 
     fun destroy() {
         windowRef?.let {
@@ -104,5 +117,8 @@ class Window(private val title: String, private val width: Int,
         }
     }
 
-    fun pollEvents() = glfwPollEvents()
+    fun update() {
+        glfwSwapBuffers(windowRef!!)
+        glfwPollEvents()
+    }
 }

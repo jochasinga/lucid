@@ -1,92 +1,95 @@
 package io.nokjao.lucid
 
-import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11.glClearColor
+import io.nokjao.lucid.interfaces.IGameLogic
 import java.util.*
 
-class Engine {
+class Engine(private val game: IGameLogic) {
 
-    private val tag = "io.nokjao.lucid.Engine"
+    companion object {
+        @JvmStatic val TARGET_FPS = 75
+        @JvmStatic val TARGET_UPS = 30
+    }
 
-    private lateinit var window: Window
+    @JvmField var running = false
     private lateinit var thread: Thread
-    private lateinit var renderer: Renderer
-    private lateinit var world: World
-    private lateinit var inputHandler: InputHandler
+    private val window = Window("Hello World",
+                            300, 300, true)
 
-    private var running = false
+    inner class Loop : Runnable {
 
-    inner class Loop(
-        private val fps: Int = 75,
-        private val ups: Int = 30
-    ) : Runnable {
-
-        private val msPerUpdate = 1.0 / ups
+        private val msPerUpdate = 1.0 / TARGET_UPS
 
         override fun run() {
-
-            System.out.println("Hello Lucid!")
-
-            init()
-            loop()
-
-            window.destroy()
+            println("Hello Lucid!")
+            try {
+                init()
+                loop()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                destroy()
+            }
         }
 
+        @Throws(Exception::class)
         private fun init() {
-            window = Window("Hello World", 300, 300, true)
             window.init()
-            renderer = Renderer()
+            game.init()
         }
-
 
         private fun loop() {
-            GL.createCapabilities()
-            glClearColor(1.0f, 0.0f, 0.0f, 0.0f)
-
             window.let {
-
                 var previous = Date().time.toDouble()
                 var lag = 0.0
-
                 while (!it.shouldClose()) {
-
                     val current = Date().time.toDouble()
                     val elapsed = current - previous
                     previous = current
                     lag += elapsed
 
-                    // handleInput()
-                    System.out.println("handling output")
+                    input()
 
                     while (lag >= msPerUpdate) {
-                        // update()
-                        System.out.println("catching up")
+                        update((lag / msPerUpdate).toFloat())
+                        println("catching up")
                         lag -= msPerUpdate
                     }
 
-                    renderer.render(lag / msPerUpdate)
-
-                    it.swapBuffers()
-                    it.pollEvents()
+                    render()
                 }
             }
+        }
+
+        private fun input() {
+            game.input(window)
+        }
+
+        private fun update(interval: Float) {
+            game.update(interval)
+        }
+
+        private fun render() {
+            game.render(window)
+            window.update()
+        }
+
+        private fun destroy() {
+            window.destroy()
         }
     }
 
     fun start() {
-
         running = true
-        thread = Thread(Loop(), tag)
+        thread = Thread(Loop(), "Loop")
 
-        val os = System.getProperty("os.name")?.also {
-            if (it.contains("Mac")) {
-                thread.run()
-            } else {
-                thread.start()
+        System.getProperty("os.name")?.also {
+
+            println("Starting engine for $it")
+
+            when(it.contains("Mac")) {
+                true -> thread.run()
+                false -> thread.start()
             }
         }
-
-        System.out.println("Starting engine for $os")
     }
 }

@@ -29,6 +29,7 @@
 .idea/*.iml
 .idea/modules
 
+bin/
 libs/
 build/
 out/
