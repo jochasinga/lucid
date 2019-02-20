@@ -94,10 +94,10 @@ class Window(val title: String, val width: Int,
         } ?: false
     }
 
-    fun shouldClose() {
-        windowRef?.let {
+    fun shouldClose(): Boolean {
+        return windowRef?.let {
             glfwWindowShouldClose(it)
-        }
+        } ?: false
     }
 
     fun isResized() = resized

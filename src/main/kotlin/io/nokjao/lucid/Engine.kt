@@ -1,7 +1,6 @@
 package io.nokjao.lucid
 
 import io.nokjao.lucid.interfaces.IGameLogic
-import java.util.*
 
 class Engine(private val game: IGameLogic) {
 
@@ -10,7 +9,7 @@ class Engine(private val game: IGameLogic) {
         @JvmStatic val TARGET_UPS = 30
     }
 
-    @JvmField var running = false
+    @Volatile @JvmField var running = false
     private lateinit var thread: Thread
     private val window = Window("Hello World",
                             300, 300, true)
@@ -18,6 +17,8 @@ class Engine(private val game: IGameLogic) {
     inner class Loop : Runnable {
 
         private val msPerUpdate = 1.0 / TARGET_UPS
+        private var previous = getCurrentTime()
+        private var lag = 0.0
 
         override fun run() {
             println("Hello Lucid!")
@@ -39,10 +40,8 @@ class Engine(private val game: IGameLogic) {
 
         private fun loop() {
             window.let {
-                var previous = Date().time.toDouble()
-                var lag = 0.0
-                while (!it.shouldClose()) {
-                    val current = Date().time.toDouble()
+                while (running && !it.shouldClose()) {
+                    val current = getCurrentTime()
                     val elapsed = current - previous
                     previous = current
                     lag += elapsed
@@ -56,6 +55,9 @@ class Engine(private val game: IGameLogic) {
                     }
 
                     render()
+
+                    if (!window.isvSync())
+                        sync()
                 }
             }
         }
@@ -76,6 +78,19 @@ class Engine(private val game: IGameLogic) {
         private fun destroy() {
             window.destroy()
         }
+
+        private fun sync() {
+            val loopSlot = 1f / TARGET_FPS
+            val endTime = previous + loopSlot
+            while (getCurrentTime() < endTime) {
+                try {
+                    Thread.sleep(1)
+                } catch (ie: InterruptedException) {}
+            }
+        }
+
+        private fun getCurrentTime(): Double = System.nanoTime() / 1000_000_000.0
+
     }
 
     fun start() {
@@ -91,5 +106,9 @@ class Engine(private val game: IGameLogic) {
                 false -> thread.start()
             }
         }
+    }
+
+    fun stop() {
+        running = false
     }
 }
