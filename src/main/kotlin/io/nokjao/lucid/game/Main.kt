@@ -1,4 +1,6 @@
-package io.nokjao.lucid
+package io.nokjao.lucid.game
+
+import io.nokjao.lucid.core.Engine
 
 class Main
 

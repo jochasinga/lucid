@@ -1,4 +1,4 @@
-package io.nokjao.lucid
+package io.nokjao.lucid.game
 
 import org.lwjgl.opengl.GL11.*
 

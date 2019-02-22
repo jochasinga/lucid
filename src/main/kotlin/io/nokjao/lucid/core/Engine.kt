@@ -1,6 +1,6 @@
-package io.nokjao.lucid
+package io.nokjao.lucid.core
 
-import io.nokjao.lucid.interfaces.IGameLogic
+import io.nokjao.lucid.core.interfaces.IGameLogic
 
 class Engine(private val game: IGameLogic) {
 
@@ -11,8 +11,10 @@ class Engine(private val game: IGameLogic) {
 
     @Volatile @JvmField var running = false
     private lateinit var thread: Thread
-    private val window = Window("Hello World",
-                            300, 300, true)
+    private val window = Window(
+        "Hello World",
+        300, 300, true
+    )
 
     inner class Loop : Runnable {
 

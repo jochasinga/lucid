@@ -1,6 +1,7 @@
-package io.nokjao.lucid
+package io.nokjao.lucid.game
 
-import io.nokjao.lucid.interfaces.*
+import io.nokjao.lucid.core.Window
+import io.nokjao.lucid.core.interfaces.*
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL11.glViewport
 

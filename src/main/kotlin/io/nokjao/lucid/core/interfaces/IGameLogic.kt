@@ -1,6 +1,6 @@
-package io.nokjao.lucid.interfaces
+package io.nokjao.lucid.core.interfaces
 
-import io.nokjao.lucid.Window
+import io.nokjao.lucid.core.Window
 import java.lang.Exception
 
 interface IGameLogic {

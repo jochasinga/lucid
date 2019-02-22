@@ -1,4 +1,4 @@
-package io.nokjao.lucid
+package io.nokjao.lucid.core
 
 import org.lwjgl.glfw.*
 import org.lwjgl.glfw.Callbacks.*
