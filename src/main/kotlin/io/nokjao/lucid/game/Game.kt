@@ -3,7 +3,6 @@ package io.nokjao.lucid.game
 import io.nokjao.lucid.core.Window
 import io.nokjao.lucid.core.interfaces.*
 import org.lwjgl.glfw.GLFW
-import org.lwjgl.opengl.GL11.glViewport
 
 class Game : IGameLogic {
 
@@ -36,12 +35,12 @@ class Game : IGameLogic {
     }
 
     override fun render(window: Window) {
-        if (window.isResized()) {
-            glViewport(0, 0, window.width, window.height)
-            window.resized = false
-        }
-        window.setClearColor(color, 0.0f, 0.0f, 0.0f)
-        renderer.clear()
+        window.setClearColor(color, color, color, 0.0f)
+        renderer.render(window)
+    }
+
+    override fun cleanup() {
+        renderer.cleanup()
     }
 }
 

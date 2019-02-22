@@ -12,4 +12,6 @@ interface IGameLogic {
     fun update(interval: Float)
 
     fun render(window: Window)
+
+    fun cleanup()
 }

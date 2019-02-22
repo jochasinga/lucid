@@ -30,7 +30,7 @@ class Engine(private val game: IGameLogic) {
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
-                destroy()
+                cleanup()
             }
         }
 
@@ -52,7 +52,6 @@ class Engine(private val game: IGameLogic) {
 
                     while (lag >= msPerUpdate) {
                         update((lag / msPerUpdate).toFloat())
-                        println("catching up")
                         lag -= msPerUpdate
                     }
 
@@ -77,8 +76,9 @@ class Engine(private val game: IGameLogic) {
             window.update()
         }
 
-        private fun destroy() {
-            window.destroy()
+        private fun cleanup() {
+            game.cleanup()
+            // window.destroy()
         }
 
         private fun sync() {
