@@ -2,7 +2,7 @@ package io.nokjao.lucid.game
 
 import io.nokjao.lucid.core.Utils
 import io.nokjao.lucid.core.Window
-import io.nokjao.lucid.core.graph.ShaderProgram
+import io.nokjao.lucid.core.graph.*
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL15
 import org.lwjgl.opengl.GL30.*
@@ -12,9 +12,9 @@ import java.nio.FloatBuffer
 
 class Renderer {
 
-    private var vaoId: Int? = null
+    // private var vaoId: Int? = null
 
-    private var vboId: Int? = null
+    // private var vboId: Int? = null
 
     private lateinit var shaderProgram: ShaderProgram
 
@@ -28,6 +28,7 @@ class Renderer {
             link()
         }
 
+        /*
         val vertices = floatArrayOf(
             0.0f, 0.5f, 0.0f,
             -0.5f, -0.5f, 0.0f,
@@ -71,11 +72,12 @@ class Renderer {
                 MemoryUtil.memFree(it)
             }
         }
+        */
     }
 
     private fun clear() = glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
-    fun render(window: Window) {
+    fun render(window: Window, mesh: Mesh) {
         clear()
 
         if (window.isResized()) {
@@ -85,14 +87,18 @@ class Renderer {
 
         shaderProgram.bind()
 
-        vaoId?.let {
+        // Draw the mesh
+        mesh.vaoId?.let {
             glBindVertexArray(it)
         }
-
         glEnableVertexAttribArray(0)
+        glEnableVertexAttribArray(1)
+        mesh.vertexCount?.let {
+            glDrawElements(GL_TRIANGLES, it, GL_UNSIGNED_INT, 0)
+        }
 
         // Draw the vertices
-        glDrawArrays(GL11.GL_TRIANGLES, 0, 3)
+        // glDrawArrays(GL11.GL_TRIANGLES, 0, 3)
 
         // Restore state
         glDisableVertexAttribArray(0)
@@ -104,6 +110,7 @@ class Renderer {
     fun cleanup() {
         shaderProgram.cleanup()
 
+        /*
         glDisableVertexAttribArray(0)
 
         // Delete the VBO
@@ -117,6 +124,7 @@ class Renderer {
         vaoId?.let {
             glDeleteVertexArrays(it)
         }
+        */
     }
 }
 
